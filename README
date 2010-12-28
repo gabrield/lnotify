@@ -17,6 +17,8 @@ Lua 5.1.4  Copyright (C) 1994-2008 Lua.org, PUC-Rio
 > notify.message("This is my first test", "It also works with icons", "/usr/share/icons/gnome/22x22/apps/calc.png") -- with icon
 
 
+Look at test/ folder to see an example using emergency levels, icons, etc..
+
 To install lnotify, just copy notify.so to your Lua library path, usually /usr/local/lib/lua/5.1/ , like:
 
 $ sudo cp notify.so /usr/local/lib/lua/5.1/
