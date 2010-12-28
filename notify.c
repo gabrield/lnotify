@@ -96,14 +96,14 @@ static int notify(lua_State *L)
         /*notify_notification_close(notification, NULL);*/
         notification = notify_notification_new(summary, body, icon, NULL);
         notify_notification_set_urgency(notification, level);
-      /*printf("NEW\n");*/
+        /*printf("NEW\n");*/
     }
     else
     {
 /*      notify_notification_close(notification, NULL);
         notification = notify_notification_new(summary, body, icon, NULL);
         notify_notification_set_urgency(notification, level);
-	printf("UPDATE\n");*/
+        printf("UPDATE\n");*/
         notify_notification_update(notification, summary, body, icon);
     }
 
