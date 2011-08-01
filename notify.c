@@ -36,96 +36,99 @@ THE SOFTWARE.
 #define VERSION 0.3
 #endif
 
-int LUA_API luaopen_notify(lua_State *);
+int LUA_API luaopen_notify (lua_State *);
 
-static int newnotify(lua_State *L)
+static int
+newnotify (lua_State * L)
 {
-  NotifyNotification *notification  = NULL;
+  NotifyNotification *notification = NULL;
   const char *summary, *body, *icon;
   GError *error = NULL;
 
-  if(!notify_init("icon-summary-body"))
-  {
+  if (!notify_init ("icon-summary-body")) {
     g_error_free (error);
-    return luaL_error(L, "icon-summary-body");
+    return luaL_error (L, "icon-summary-body");
   }
-   
-  if(lua_gettop(L) > 2 )
-    icon = luaL_checkstring(L, 3);
+
+  if (lua_gettop (L) > 2)
+    icon = luaL_checkstring (L, 3);
   else
     icon = NULL;
- 
-  summary = luaL_checkstring(L, 1);
-  body = luaL_checkstring(L, 2);
 
-  if(notification == (NotifyNotification*)0)
-  {
-    notification = notify_notification_new(summary, body, icon, NULL);
+  summary = luaL_checkstring (L, 1);
+  body = luaL_checkstring (L, 2);
+
+  if (notification == (NotifyNotification *) 0) {
+    notification = notify_notification_new (summary, body, icon, NULL);
   }
-  
-  lua_pushlightuserdata(L, notification);
+
+  lua_pushlightuserdata (L, notification);
 
   return 1;
 }
 
 
-static int show(lua_State *L)
-{  
-  NotifyNotification *notify = (NotifyNotification *)lua_touserdata(L, 1);
+static int
+show (lua_State * L)
+{
+  NotifyNotification *notify = (NotifyNotification *) lua_touserdata (L, 1);
 
-  if(notify)
-    notify_notification_show(notify, NULL);
+  notify_notification_set_hint (notify, "OBA", NULL);
+  if (notify)
+    notify_notification_show (notify, NULL);
   else
-    luaL_error(L, "NULL");
+    luaL_error (L, "NULL");
+
+
+
   return 0;
 }
 
-static int set_urgency(lua_State *L)
+static int
+set_urgency (lua_State * L)
 {
   NotifyUrgency level = 0;
   int l = 0;
-  NotifyNotification *notify = (NotifyNotification *)lua_touserdata(L, 1);
-  
-  if(!lua_isnumber(L, 2))
-  {
-  return lua_error(L);
+  NotifyNotification *notify = (NotifyNotification *) lua_touserdata (L, 1);
+
+  if (!lua_isnumber (L, 2)) {
+    return lua_error (L);
   }
-  
-  l  = luaL_checknumber(L, 2);
-  
-  if(l <= 0 || l > 3) /*check if the number is lower or higher than the allowed numbers. if the number is not valid, returns 0*/
+
+  l = luaL_checknumber (L, 2);
+
+  if (l <= 0 || l > 3)		/*check if the number is lower or higher than the allowed numbers. if the number is not valid, returns 0 */
     return 0;
 
-  switch(l)
-  {
-    case 1:
-      level = NOTIFY_URGENCY_LOW;
-      break;
-    case 2:
-      level = NOTIFY_URGENCY_NORMAL;
-      break;
-    case 3:
-      level = NOTIFY_URGENCY_CRITICAL;
-      break;
+  switch (l) {
+  case 1:
+    level = NOTIFY_URGENCY_LOW;
+    break;
+  case 2:
+    level = NOTIFY_URGENCY_NORMAL;
+    break;
+  case 3:
+    level = NOTIFY_URGENCY_CRITICAL;
+    break;
   }
-  notify_notification_set_urgency(notify, level);
+  notify_notification_set_urgency (notify, level);
   return 0;
 }
 
-int LUA_API luaopen_notify(lua_State *L)
+int LUA_API
+luaopen_notify (lua_State * L)
 {
-  const luaL_Reg driver[] = 
-  {
+  const luaL_Reg driver[] = {
     {"show", show},
     {"set_urgency", set_urgency},
     {"new", newnotify},
     {NULL, NULL},
   };
-  
+
   luaL_openlib (L, "notify", driver, 0);
-  lua_pushliteral(L, "version");
-  lua_pushinteger(L, VERSION);
-  lua_settable(L, -3);
-  
+  lua_pushliteral (L, "version");
+  lua_pushinteger (L, VERSION);
+  lua_settable (L, -3);
+
   return 1;
 }
