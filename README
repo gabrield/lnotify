@@ -13,8 +13,9 @@ To use lnotify is easy, just require it on Lua, like this:
 $ lua
 Lua 5.1.4  Copyright (C) 1994-2008 Lua.org, PUC-Rio
 > require("notify")
-> notify.message("This is my first test", "It works")
-> notify.message("This is my first test", "It also works with icons", "/usr/share/icons/gnome/22x22/apps/calc.png") -- with icon
+> n1 = notify.new("Lua libnotify bind (level 1-> LOW)", "This is a teste :D")
+> notify.set_urgency(n1, 1)
+> notify.show(n1);
 
 
 Look at test/ folder to see an example using emergency levels, icons, etc..
