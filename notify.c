@@ -73,7 +73,6 @@ show (lua_State * L)
 {
   NotifyNotification *notify = (NotifyNotification *) lua_touserdata (L, 1);
 
-  notify_notification_set_hint (notify, "OBA", NULL);
   if (notify)
     notify_notification_show (notify, NULL);
   else
