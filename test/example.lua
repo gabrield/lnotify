@@ -33,3 +33,5 @@ path = os.getenv("PWD") .. "/system-shutdown.svg"
 n3 = notify.new("Cheers (level 2-> NORMAL)", "BRB", path)
 notify.set_urgency(n3, 2)
 notify.show(n3)
+
+= notify.VERSION
