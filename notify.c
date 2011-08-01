@@ -1,7 +1,7 @@
 /*
 ===============================================================================
 
-Copyright (C) 2010 Gabriel Duarte (gabrield@impa.br)
+Copyright (C) 2010 Gabriel Duarte (gabrield@idevio.us)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,6 @@ static int newnotify(lua_State *L)
     icon = luaL_checkstring(L, 3);
   else
     icon = NULL;
-
  
   summary = luaL_checkstring(L, 1);
   body = luaL_checkstring(L, 2);
@@ -95,21 +94,20 @@ static int set_urgency(lua_State *L)
   l  = luaL_checknumber(L, 2);
   
   if(l <= 0 || l > 3) /*check if the number is lower or higher than the allowed numbers. if the number is not valid, returns 0*/
-  return 0;
+    return 0;
 
   switch(l)
   {
-  case 1:
-    level = NOTIFY_URGENCY_LOW;
-     break;
-  case 2:
-     level = NOTIFY_URGENCY_NORMAL;
-     break;
-  case 3:
-     level = NOTIFY_URGENCY_CRITICAL;
-     break;
+    case 1:
+      level = NOTIFY_URGENCY_LOW;
+      break;
+    case 2:
+      level = NOTIFY_URGENCY_NORMAL;
+      break;
+    case 3:
+      level = NOTIFY_URGENCY_CRITICAL;
+      break;
   }
-
   notify_notification_set_urgency(notify, level);
   return 0;
 }
