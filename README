@@ -1,4 +1,5 @@
-lnotify is simple library binding libnotify to Lua, quite easy to use, supporting emergency levels. Pop up notifications from Lua to your desktop now is a piece of cake. 
+lnotify is a simple library binding libnotify to Lua, quite easy to use, supporting emergency levels.
+Pop up notifications from Lua to your desktop now is a piece of cake. 
 
 To compile lnotify, you need o have installed the develpment files of libnotify and gtk+-2.0 . After that, just type "make" to compile:
 
