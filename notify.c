@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <unistd.h>
 #include <libnotify/notify.h>
 
-#define VERSION "0.3"
+#define VERSION 0.3
 
 int LUA_API luaopen_notify (lua_State *);
 
@@ -124,7 +124,7 @@ luaopen_notify (lua_State * L)
 
   luaL_openlib (L, "notify", driver, 0);
   lua_pushliteral (L, "VERSION");
-  lua_pushliteral (L, VERSION);
+  lua_pushnumber (L, VERSION);
   lua_settable (L, -3);
 
   return 1;
