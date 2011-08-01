@@ -1,11 +1,3 @@
------------
-
-Lua is licensed under the terms of the MIT license reproduced below.
-This means that Lua is free software and can be used for both academic
-and commercial purposes at absolutely no cost.
-
-For details and rationale, see http://www.lua.org/license.html .
-
 ===============================================================================
 
 Copyright (C) 2010-2011 Gabriel Duarte <gabrield@devio.us>
@@ -29,5 +21,3 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ===============================================================================
-
-(end of COPYRIGHT)
