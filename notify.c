@@ -40,7 +40,7 @@ static int
 newnotify (lua_State * L)
 {
   NotifyNotification *notification = NULL;
-  const char *summary, *body, *icon;
+  const char *summary, *body;
   GError *error = NULL;
 
   if (!notify_init ("icon-summary-body")) {
@@ -48,16 +48,21 @@ newnotify (lua_State * L)
     return luaL_error (L, "icon-summary-body");
   }
 
-  if (lua_gettop (L) > 2)
-    icon = luaL_checkstring (L, 3);
-  else
-    icon = NULL;
-
   summary = luaL_checkstring (L, 1);
   body = luaL_checkstring (L, 2);
 
   if (notification == (NotifyNotification *) 0) {
-    notification = notify_notification_new (summary, body, icon, NULL);
+#if defined(NOTIFY_CHECK_VERSION) && NOTIFY_CHECK_VERSION(0, 7, 0)
+    notification = notify_notification_new (summary, body, NULL);
+#else
+    {
+      const char *icon = (lua_gettop (L) > 2)
+        ? luaL_checkstring (L, 3)
+        : NULL;
+
+      notification = notify_notification_new (summary, body, icon, NULL);
+    }
+#endif
   }
 
   lua_pushlightuserdata (L, notification);
