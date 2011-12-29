@@ -17,7 +17,7 @@ end
 
 path = os.getenv("PWD") .. "/application-zip.svg"
 
-n1 = notify.new("Lua libnotify bind (level 1-> LOW)", "This is a teste :D", path)
+n1 = notify.new("Lua libnotify bind (level 1-> LOW)", "This is a test :D", path)
 notify.set_urgency(n1, 1)
 notify.show(n1);
 sleep(2)
