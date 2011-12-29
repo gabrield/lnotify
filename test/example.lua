@@ -17,7 +17,7 @@ end
 
 path = os.getenv("PWD") .. "/application-zip.svg"
 
-n1 = notify.new("Lua libnotify bind (level 1-> LOW)", "This is a teste :D", path)
+n1 = notify.new("Lua libnotify bind (level 1-> LOW)", "This is a test :D", path)
 notify.set_urgency(n1, 1)
 notify.show(n1);
 sleep(2)
@@ -33,5 +33,3 @@ path = os.getenv("PWD") .. "/system-shutdown.svg"
 n3 = notify.new("Cheers (level 2-> NORMAL)", "BRB", path)
 notify.set_urgency(n3, 2)
 notify.show(n3)
-
-= notify.VERSION
