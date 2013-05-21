@@ -26,13 +26,14 @@ THE SOFTWARE.
 
 #include <stdio.h>
 #include <lua.h>
+#include <lualib.h>
 #include <lauxlib.h>
 #include <math.h>
-#include <glib.h>
+#include <glib-2.0/glib.h>
 #include <unistd.h>
 #include <libnotify/notify.h>
 
-#define VERSION 0.3
+#define VERSION 0.4
 
 int LUA_API luaopen_notify (lua_State *);
 
@@ -65,8 +66,12 @@ newnotify (lua_State * L)
 #endif
     );
   }
+  NotifyNotification **note_pointer = (NotifyNotification **)lua_newuserdata(L, sizeof(NotifyNotification *));
+  *note_pointer = notification;
+  luaL_getmetatable(L, "lnotify.notification");
+  lua_setmetatable(L, -2);
 
-  lua_pushlightuserdata (L, notification);
+  /* lua_pushlightuserdata (L, notification); */
 
   return 1;
 }
@@ -75,14 +80,12 @@ newnotify (lua_State * L)
 static int
 show (lua_State * L)
 {
-  NotifyNotification *notify = (NotifyNotification *) lua_touserdata (L, 1);
+  NotifyNotification **notify = (NotifyNotification **)luaL_checkudata(L, 1, "lnotify.notification");
 
   if (notify)
-    notify_notification_show (notify, NULL);
+    notify_notification_show (*notify, NULL);
   else
     luaL_error (L, "NULL");
-
-
 
   return 0;
 }
@@ -92,7 +95,7 @@ set_urgency (lua_State * L)
 {
   NotifyUrgency level = 0;
   int l = 0;
-  NotifyNotification *notify = (NotifyNotification *) lua_touserdata (L, 1);
+  NotifyNotification **notify = (NotifyNotification **)luaL_checkudata(L, 1, "lnotify.notification");
 
   if (!lua_isnumber (L, 2)) {
     return lua_error (L);
@@ -114,7 +117,7 @@ set_urgency (lua_State * L)
     level = NOTIFY_URGENCY_CRITICAL;
     break;
   }
-  notify_notification_set_urgency (notify, level);
+  notify_notification_set_urgency (*notify, level);
   return 0;
 }
 
@@ -122,16 +125,22 @@ int LUA_API
 luaopen_notify (lua_State * L)
 {
   const luaL_Reg driver[] = {
-    {"show", show},
-    {"set_urgency", set_urgency},
     {"new", newnotify},
     {NULL, NULL},
   };
 
-  luaL_openlib (L, "notify", driver, 0);
-  lua_pushliteral (L, "VERSION");
-  lua_pushnumber (L, VERSION);
-  lua_settable (L, -3);
+  const luaL_Reg notify_object[] = {
+    {"show", show},
+    {"set_urgency", set_urgency},
+    {NULL, NULL},
+  };
+
+  luaL_newmetatable(L, "lnotify.notification");
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "__index");
+  luaL_setfuncs(L, notify_object, 0);
+
+  luaL_newlib(L, driver);
 
   return 1;
 }
