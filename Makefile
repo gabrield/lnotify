@@ -23,7 +23,7 @@ DISTFILES=$(SRCS) $(EXTRA_DIST)
 all: $(LIBNAME)
 
 $(LIBNAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(LIB_OPTION) $(OBJS)
+	$(CC) -o $@ $(LIB_OPTION) $(OBJS) $(CFLAGS)
 
 clean:
 	rm -f $(LIBNAME) *.o $(TARBALL)
