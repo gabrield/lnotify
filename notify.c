@@ -25,6 +25,7 @@ THE SOFTWARE.
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <lua.h>
 #include <lauxlib.h>
 #include <math.h>
@@ -42,15 +43,20 @@ newnotify (lua_State * L)
   NotifyNotification *notification = NULL;
   const char *summary, *body, *icon;
   GError *error = NULL;
+  int top;
 
-  if (!notify_init ("icon-summary-body")) {
+  if (!notify_is_initted() && !notify_init ("icon-summary-body")) {
     g_error_free (error);
     return luaL_error (L, "icon-summary-body");
   }
 
+  top = lua_gettop(L);
   summary = luaL_checkstring (L, 1);
-  body = luaL_checkstring (L, 2);
-  icon = (lua_gettop (L) > 2)
+
+  body = (top > 1)
+    ? luaL_checkstring (L, 2)
+    : NULL;
+  icon = (top > 2)
     ? luaL_checkstring (L, 3)
     : NULL;
 
@@ -71,49 +77,72 @@ newnotify (lua_State * L)
   return 1;
 }
 
+static int
+setappname (lua_State * L)
+{
+  const char *name;
+  NotifyNotification *notify;
+
+  if (lua_gettop(L) < 2) {
+    /* if there are less than two args, assume we're trying to set the default app name */
+    name = luaL_checkstring(L, 1);
+    if (notify_is_initted())
+      notify_set_app_name(name);
+    else
+      notify_init(name);
+  }
+  else {
+    notify = (NotifyNotification *) lua_touserdata(L, 1);
+    if (!notify) luaL_argerror(L, 1, "Unknown type");
+    name = luaL_checkstring(L, 2);
+    notify_notification_set_app_name(notify, name);
+  }
+
+  return 0;
+}
 
 static int
 show (lua_State * L)
 {
   NotifyNotification *notify = (NotifyNotification *) lua_touserdata (L, 1);
-
-  if (notify)
-    notify_notification_show (notify, NULL);
-  else
-    luaL_error (L, "NULL");
-
-
-
+  if (!notify) luaL_argerror(L, 1, "Unknown type");
+  notify_notification_show (notify, NULL);
   return 0;
 }
 
 static int
 set_urgency (lua_State * L)
 {
-  NotifyUrgency level = 0;
   int l = 0;
+  NotifyUrgency level = 0;
   NotifyNotification *notify = (NotifyNotification *) lua_touserdata (L, 1);
+  if (!notify) luaL_argerror(L, 1, "Unknown type");
 
-  if (!lua_isnumber (L, 2)) {
-    return lua_error (L);
+  if (lua_isnumber(L, 2)) {
+      l = lua_tointeger(L, 2);
+  }
+  else {
+      const char *lstr = luaL_checkstring(L, 2);
+      if      (strcmp(lstr, "low") == 0)      l = 1;
+      else if (strcmp(lstr, "normal") == 0)   l = 2;
+      else if (strcmp(lstr, "critical") == 0) l = 3;
+      else luaL_argerror(L, 2, lstr);
   }
 
-  l = luaL_checknumber (L, 2);
-
-  if (l <= 0 || l > 3)		/*check if the number is lower or higher than the allowed numbers. if the number is not valid, returns 0 */
-    return 0;
-
-  switch (l) {
-  case 1:
-    level = NOTIFY_URGENCY_LOW;
-    break;
-  case 2:
-    level = NOTIFY_URGENCY_NORMAL;
-    break;
-  case 3:
-    level = NOTIFY_URGENCY_CRITICAL;
-    break;
+  switch(l) {
+    case 1:
+      level = NOTIFY_URGENCY_LOW;
+      break;
+    case 2:
+      level = NOTIFY_URGENCY_NORMAL;
+      break;
+    case 3:
+      level = NOTIFY_URGENCY_CRITICAL;
+      break;
+    default:
+      luaL_argerror(L, 2, lua_tolstring(L, 2, NULL)); /* coerce int to string */
   }
+
   notify_notification_set_urgency (notify, level);
   return 0;
 }
@@ -124,11 +153,17 @@ luaopen_notify (lua_State * L)
   const luaL_Reg driver[] = {
     {"show", show},
     {"set_urgency", set_urgency},
+    {"set_appname", setappname},
     {"new", newnotify},
     {NULL, NULL},
   };
 
-  luaL_openlib (L, "notify", driver, 0);
+#if LUA_VERSION_NUM == 502
+  luaL_newlib(L, driver);
+#else
+  luaL_register(L, "notify", driver);
+#endif
+
   lua_pushliteral (L, "VERSION");
   lua_pushnumber (L, VERSION);
   lua_settable (L, -3);
