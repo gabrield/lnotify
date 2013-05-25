@@ -1,7 +1,9 @@
-LUA_INC= /usr/include/lua5.1
+ifndef LUA_INC
+	LUA_INC= lua5.1
+endif
 
 WARN= -Wall -Wmissing-prototypes -Wmissing-declarations -ansi -pedantic -fPIC
-INCS= -I$(LUA_INC)
+INCS= -I/usr/include/$(LUA_INC)
 CFLAGS= -O2 $(WARN) $(INCS) $(DEFS) `pkg-config --cflags --libs gtk+-2.0 libnotify` 
 CXXFLAGS= -O2 $(WARN) $(INCS) $(DEFS)
 CC= gcc
